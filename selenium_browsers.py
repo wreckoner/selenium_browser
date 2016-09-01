@@ -35,6 +35,12 @@ class AbstractBrowser(object):
 		else:
 			raise ValueError('No submit button parameter provided')
 
+	def get_page_source(self):
+		"""
+		Returns html source of current page.
+		"""
+		return self.driver.page_source
+
 	def get_url(self, url):
 		self.driver.get(url)
 
@@ -43,6 +49,9 @@ class AbstractBrowser(object):
 
 	def find_element_by_id(self, _id):
 		return self.driver.find_element(By.ID, _id)
+
+	def find_element_by_tag(self, tag_name):
+		return self.driver.find_element(By.TAG_NAME, tag_name)
 
 	def wait_for_element(self, attribute_value, by=By.ID):
 		self.wait.until(expected_conditions.presence_of_element_located((by, attribute_value)))
