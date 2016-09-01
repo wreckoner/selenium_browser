@@ -11,17 +11,18 @@ class AbstractBrowser(object):
 	"""
 	Abstract browser class which has a webdriver and helper functions as attributes.
 	"""
-	def __init__(self, executable_path, browser='chromium', **kwargs):
+	def __init__(self, executable_path, driver, **kwargs):
 		"""
 		browser takes the following values: chromium, firefox, iexplorer
 		"""
-		if browser == 'chromium':
+		if driver.lower() == 'chromium':
 			chrome_options = webdriver.ChromeOptions()
 			chrome_options.add_experimental_option("prefs", kwargs.get('chrome_options', {}))
 			self.driver = webdriver.Chrome(executable_path=executable_path, chrome_options=chrome_options)
+		elif driver.lower() == 'phantomjs':
+			self.driver = webdriver.PhantomJS()
 		else:
-			raise ValueError('Only Chromium webdriver supported at this time.')
-		self.wait = WebDriverWait(self.driver, 600)
+			raise ValueError('Invalid web driver specified')
 
 	def submit_form(self, credentials, **kwargs):
 		if len(credentials):
@@ -53,8 +54,8 @@ class AbstractBrowser(object):
 	def find_element_by_tag(self, tag_name):
 		return self.driver.find_element(By.TAG_NAME, tag_name)
 
-	def wait_for_element(self, attribute_value, by=By.ID):
-		self.wait.until(expected_conditions.presence_of_element_located((by, attribute_value)))
+	def wait_for_element(self, attribute_value, by=By.ID, timeout=120):
+		WebDriverWait(self.driver, timeout).until(expected_conditions.presence_of_element_located((by, attribute_value)))
 
 	def sleep(self, seconds=60):
 		"""
